@@ -1,0 +1,89 @@
+.canvas-screen {
+  height: 100dvh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 76px 1fr 280px;
+  grid-template-rows: 56px 1fr;
+  grid-template-areas:
+    "topbar topbar topbar"
+    "rail canvas style";
+  background: var(--app-bg);
+  overflow: hidden;
+}
+
+.canvas-viewport {
+  grid-area: canvas;
+  position: relative;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.zoom-control {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-pop);
+  padding: 4px;
+}
+
+.zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover-bg);
+  }
+}
+
+.zoom-value {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  width: 46px;
+  cursor: pointer;
+  padding: 0 2px;
+
+  &:hover {
+    color: var(--text-h);
+  }
+}
+
+@media (max-width: 900px) {
+  .canvas-screen {
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px 1fr 72px;
+    grid-template-areas:
+      "topbar"
+      "canvas"
+      "rail";
+  }
+
+  .canvas-viewport {
+    padding: 16px;
+  }
+
+  .zoom-control {
+    right: 12px;
+    bottom: 12px;
+  }
+}
