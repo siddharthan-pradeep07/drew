@@ -45,6 +45,7 @@ export default function CanvasScreen({ pageConfig: initialPageConfig, initialEle
     strokeColor: "#000000",
     strokeWidth: 4,
     strokeStyle: "solid",
+    brush: "pen",
     fill: "transparent",
     opacity: 1,
   });
@@ -226,7 +227,7 @@ export default function CanvasScreen({ pageConfig: initialPageConfig, initialEle
   const handleDuplicate = useCallback(() => {
     if (selectedIdsRef.current.size === 0) return;
     const toDupe = elementsRef.current.filter((el) => selectedIdsRef.current.has(el.id));
-    const clones = toDupe.map((el) => translateElement({ ...el, id: makeId() }, 16, 16));
+    const clones = toDupe.map((el) => translateElement({ ...el, id: makeId(), seed: Math.random() }, 16, 16));
     setElementsState((prev) => [...prev, ...clones]);
     setSelectedIds(new Set(clones.map((c) => c.id)));
     commit();
@@ -352,6 +353,8 @@ export default function CanvasScreen({ pageConfig: initialPageConfig, initialEle
             strokeColor: "#000000",
             strokeWidth: 0,
             strokeStyle: "solid",
+            brush: "pen",
+            seed: 0,
             fill: "transparent",
             opacity: 1,
           };
@@ -460,7 +463,7 @@ export default function CanvasScreen({ pageConfig: initialPageConfig, initialEle
       }
       if (mod && e.key.toLowerCase() === "v") {
         if (clipboardRef.current.length > 0) {
-          const clones = clipboardRef.current.map((el) => translateElement({ ...el, id: makeId() }, 16, 16));
+          const clones = clipboardRef.current.map((el) => translateElement({ ...el, id: makeId(), seed: Math.random() }, 16, 16));
           clipboardRef.current = clones;
           setElementsState((prev) => [...prev, ...clones]);
           setSelectedIds(new Set(clones.map((c) => c.id)));
@@ -666,5 +669,5 @@ export default function CanvasScreen({ pageConfig: initialPageConfig, initialEle
 }
 
 function elementStyleOf(el: DrewElement): ElementStyle {
-  return { strokeColor: el.strokeColor, strokeWidth: el.strokeWidth, strokeStyle: el.strokeStyle, fill: el.fill, opacity: el.opacity };
+  return { strokeColor: el.strokeColor, strokeWidth: el.strokeWidth, strokeStyle: el.strokeStyle, brush: el.brush, fill: el.fill, opacity: el.opacity };
 }

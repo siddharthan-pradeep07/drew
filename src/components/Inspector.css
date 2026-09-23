@@ -128,6 +128,44 @@
   cursor: pointer;
 }
 
+.brush-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 2px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 10.5px;
+    cursor: pointer;
+
+    &:hover:not(.active) {
+      background: var(--hover);
+    }
+    &.active {
+      background: var(--text-strong);
+      color: var(--bg);
+      border-color: var(--text-strong);
+    }
+  }
+}
+
+.style-block {
+  transition: opacity 0.15s ease;
+
+  &.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
 .segmented {
   display: flex;
   border: 1px solid var(--line);

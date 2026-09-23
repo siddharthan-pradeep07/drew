@@ -448,6 +448,8 @@ const CanvasStage = forwardRef<CanvasStageHandle, CanvasStageProps>(function Can
           strokeColor: style.strokeColor,
           strokeWidth: 0,
           strokeStyle: "solid",
+          brush: "pen",
+          seed: 0,
           fill: "transparent",
           opacity: style.opacity,
         };
@@ -469,6 +471,8 @@ const CanvasStage = forwardRef<CanvasStageHandle, CanvasStageProps>(function Can
           strokeColor: style.strokeColor,
           strokeWidth: style.strokeWidth,
           strokeStyle: style.strokeStyle,
+          brush: style.brush,
+          seed: Math.random(),
           fill: "transparent",
           opacity: style.opacity,
         };
@@ -485,6 +489,8 @@ const CanvasStage = forwardRef<CanvasStageHandle, CanvasStageProps>(function Can
           strokeColor: style.strokeColor,
           strokeWidth: style.strokeWidth,
           strokeStyle: style.strokeStyle,
+          brush: style.brush,
+          seed: Math.random(),
           fill: "transparent",
           opacity: style.opacity,
         };
@@ -503,6 +509,8 @@ const CanvasStage = forwardRef<CanvasStageHandle, CanvasStageProps>(function Can
           strokeColor: style.strokeColor,
           strokeWidth: style.strokeWidth,
           strokeStyle: style.strokeStyle,
+          brush: style.brush,
+          seed: Math.random(),
           fill: style.fill,
           opacity: style.opacity,
         };

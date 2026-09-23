@@ -294,6 +294,45 @@ export function LockIcon({ size = 14, className }: IconProps) {
   );
 }
 
+export function PencilIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} className={className} {...base}>
+      <path d="m4 20 1-4.5L15.5 5l3.5 3.5L8.5 19Z" />
+      <path d="M13 7.5 16.5 11" />
+      <path d="M4 20 5 15.5" strokeWidth={2.6} />
+    </svg>
+  );
+}
+
+export function MarkerIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} className={className} {...base}>
+      <path d="M7 15 15 7l2 2-8 8Z" />
+      <path d="m15 7 2-3 3 3-2 2Z" />
+      <path d="M7 15 5 20l5-2Z" />
+    </svg>
+  );
+}
+
+export function HighlighterIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} className={className} {...base}>
+      <path d="m11 4 9 9-3.5 3.5L7 8Z" />
+      <path d="M7 8 4 15l5-1.5Z" />
+      <path d="M4 15 3 20l5-1Z" />
+    </svg>
+  );
+}
+
+export function CrayonIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg width={size} height={size} className={className} {...base}>
+      <path d="M6 10c0-3.5 1-6 3.5-6.5C12 3 13 5.5 13 8v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z" />
+      <path d="M6 13h7" />
+    </svg>
+  );
+}
+
 export function SaveIcon({ size = 16, className }: IconProps) {
   return (
     <svg width={size} height={size} className={className} {...base}>

@@ -1,11 +1,17 @@
-import type { DrewElement, ElementStyle, PageConfig, StrokeStyle, Unit } from "../types";
+import type { ComponentType } from "react";
+import type { Brush, DrewElement, ElementStyle, PageConfig, StrokeStyle, Unit } from "../types";
 import {
   AlignCenterIcon,
   AlignLeftIcon,
   AlignRightIcon,
   BringFrontIcon,
   CloseIcon,
+  CrayonIcon,
   DuplicateIcon,
+  HighlighterIcon,
+  MarkerIcon,
+  PenIcon,
+  PencilIcon,
   SendBackIcon,
   TrashIcon,
 } from "./Icons";
@@ -18,6 +24,14 @@ const STROKE_STYLES: { id: StrokeStyle; label: string }[] = [
   { id: "solid", label: "Solid" },
   { id: "dashed", label: "Dashed" },
   { id: "dotted", label: "Dotted" },
+];
+
+const BRUSHES: { id: Brush; label: string; icon: ComponentType<{ size?: number }> }[] = [
+  { id: "pen", label: "Pen", icon: PenIcon },
+  { id: "pencil", label: "Pencil", icon: PencilIcon },
+  { id: "marker", label: "Marker", icon: MarkerIcon },
+  { id: "highlighter", label: "Highlighter", icon: HighlighterIcon },
+  { id: "crayon", label: "Crayon", icon: CrayonIcon },
 ];
 
 interface InspectorProps {
@@ -67,6 +81,8 @@ export default function Inspector({
 }: InspectorProps) {
   const hasSelection = selectedElements.length > 0;
   const single = selectedElements.length === 1 ? selectedElements[0] : null;
+  const brushApplicable = !hasSelection || selectedElements.some((el) => el.type !== "text" && el.type !== "image");
+  const isTextured = style.brush === "pencil" || style.brush === "crayon";
   const fillApplicable = !hasSelection || selectedElements.some((el) => el.type === "rectangle" || el.type === "ellipse");
   const rectSelected = selectedElements.some((el) => el.type === "rectangle");
   const textSelected = selectedElements.some((el) => el.type === "text");
@@ -133,6 +149,25 @@ export default function Inspector({
       <div className="inspector-section">
         <div className="inspector-title">{hasSelection ? "Style" : "Default style"}</div>
 
+        {brushApplicable && (
+          <>
+            <div className="inspector-label-row">Material</div>
+            <div className="brush-grid">
+              {BRUSHES.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  className={style.brush === id ? "active" : ""}
+                  onClick={() => onStyleChange({ brush: id })}
+                  title={label}
+                >
+                  <Icon size={17} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
         <div className="inspector-label-row">Stroke</div>
         <ColorRow value={style.strokeColor} onChange={(c) => onStyleChange({ strokeColor: c })} presets={PRESET_COLORS} allowTransparent={false} />
 
@@ -147,13 +182,20 @@ export default function Inspector({
           onChange={(e) => onStyleChange({ strokeWidth: Number(e.target.value) })}
         />
 
-        <div className="inspector-label-row">Stroke style</div>
-        <div className="segmented">
-          {STROKE_STYLES.map((s) => (
-            <button key={s.id} className={style.strokeStyle === s.id ? "active" : ""} onClick={() => onStyleChange({ strokeStyle: s.id })}>
-              {s.label}
-            </button>
-          ))}
+        <div className={`style-block ${isTextured ? "disabled" : ""}`}>
+          <div className="inspector-label-row">Stroke style</div>
+          <div className="segmented">
+            {STROKE_STYLES.map((s) => (
+              <button
+                key={s.id}
+                className={style.strokeStyle === s.id ? "active" : ""}
+                disabled={isTextured}
+                onClick={() => onStyleChange({ strokeStyle: s.id })}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {fillApplicable && (

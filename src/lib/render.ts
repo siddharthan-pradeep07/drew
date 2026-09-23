@@ -1,5 +1,6 @@
 import type { Bounds, Camera, DrewElement, Point, ResizeHandle, StrokeStyle } from "../types";
 import { getHandlePositions, screenToWorld } from "./geometry";
+import { computeTexturedStroke, ellipsePolygon, getSmoothBrushParams, isTexturedBrush, rectPolygon } from "./brush";
 
 // ---------------------------------------------------------------------------
 // Image cache (data-URL keyed) so <img> loads happen once per source.
@@ -46,14 +47,51 @@ export function dashArrayFor(style: StrokeStyle, strokeWidth: number): number[] 
   }
 }
 
-function applyPaint(ctx: CanvasRenderingContext2D, el: DrewElement) {
-  ctx.globalAlpha = el.opacity;
+/** Configure the context for a "smooth" brush stroke (pen / marker / highlighter) and
+ *  return the effective line width, so callers can reuse it for e.g. arrowhead sizing. */
+function applySmoothStrokePaint(ctx: CanvasRenderingContext2D, el: DrewElement): number {
+  const params = getSmoothBrushParams(el.brush);
+  const width = el.strokeWidth * params.widthScale;
+  ctx.globalCompositeOperation = params.multiply ? "multiply" : "source-over";
+  ctx.globalAlpha = Math.min(el.opacity * params.opacityScale, params.maxOpacity);
   ctx.strokeStyle = el.strokeColor;
   ctx.fillStyle = el.strokeColor;
-  ctx.lineWidth = el.strokeWidth;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.setLineDash(dashArrayFor(el.strokeStyle, el.strokeWidth));
+  ctx.lineWidth = width;
+  ctx.lineCap = params.cap;
+  ctx.lineJoin = params.join;
+  ctx.setLineDash(dashArrayFor(el.strokeStyle, width));
+  return width;
+}
+
+/** Draw a textured (pencil/crayon) stroke along a raw point path. Pure grain data comes
+ *  from lib/brush so canvas + SVG export stay visually identical. */
+function paintTexturedStroke(ctx: CanvasRenderingContext2D, rawPoints: Point[], el: DrewElement) {
+  if (!isTexturedBrush(el.brush) || rawPoints.length === 0) return;
+  const stroke = computeTexturedStroke(rawPoints, el.strokeWidth, el.brush, el.seed);
+
+  ctx.save();
+  ctx.globalCompositeOperation = "multiply";
+  ctx.setLineDash([]);
+
+  if (stroke.core) {
+    ctx.globalAlpha = el.opacity * stroke.coreAlpha;
+    ctx.strokeStyle = el.strokeColor;
+    ctx.lineWidth = stroke.coreWidth;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    tracePolyline(ctx, stroke.core);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = el.strokeColor;
+  for (const dab of stroke.dabs) {
+    ctx.globalAlpha = el.opacity * dab.alpha;
+    ctx.beginPath();
+    ctx.arc(dab.x, dab.y, dab.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 function midpoint(a: Point, b: Point): Point {
@@ -75,13 +113,16 @@ function tracePolyline(ctx: CanvasRenderingContext2D, points: Point[]) {
   ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
 }
 
-function drawArrowhead(ctx: CanvasRenderingContext2D, from: Point, to: Point, strokeWidth: number) {
+function drawArrowhead(ctx: CanvasRenderingContext2D, from: Point, to: Point, strokeWidth: number, color: string, opacity: number) {
   const angle = Math.atan2(to.y - from.y, to.x - from.x);
   const len = Math.min(Math.max(strokeWidth * 3.2, 10), 26);
   const spread = Math.PI / 7;
   const base1 = { x: to.x - len * Math.cos(angle - spread), y: to.y - len * Math.sin(angle - spread) };
   const base2 = { x: to.x - len * Math.cos(angle + spread), y: to.y - len * Math.sin(angle + spread) };
   ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = opacity;
+  ctx.fillStyle = color;
   ctx.setLineDash([]);
   ctx.beginPath();
   ctx.moveTo(to.x, to.y);
@@ -103,55 +144,100 @@ function roundRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
 
 /** Draw a single element into world-space (caller must have applied the camera transform). */
 export function drawElement(ctx: CanvasRenderingContext2D, el: DrewElement, requestRender: () => void) {
-  applyPaint(ctx, el);
+  const textured = isTexturedBrush(el.brush);
 
   switch (el.type) {
     case "freehand": {
-      ctx.beginPath();
-      tracePolyline(ctx, el.points);
-      ctx.stroke();
+      if (textured) {
+        paintTexturedStroke(ctx, el.points, el);
+      } else {
+        applySmoothStrokePaint(ctx, el);
+        ctx.beginPath();
+        tracePolyline(ctx, el.points);
+        ctx.stroke();
+      }
       break;
     }
     case "line": {
-      ctx.beginPath();
-      ctx.moveTo(el.points[0].x, el.points[0].y);
-      ctx.lineTo(el.points[1].x, el.points[1].y);
-      ctx.stroke();
+      if (textured) {
+        paintTexturedStroke(ctx, el.points, el);
+      } else {
+        applySmoothStrokePaint(ctx, el);
+        ctx.beginPath();
+        ctx.moveTo(el.points[0].x, el.points[0].y);
+        ctx.lineTo(el.points[1].x, el.points[1].y);
+        ctx.stroke();
+      }
       break;
     }
     case "arrow": {
-      ctx.beginPath();
-      ctx.moveTo(el.points[0].x, el.points[0].y);
-      ctx.lineTo(el.points[1].x, el.points[1].y);
-      ctx.stroke();
-      drawArrowhead(ctx, el.points[0], el.points[1], el.strokeWidth);
+      let headWidth = el.strokeWidth;
+      if (textured) {
+        paintTexturedStroke(ctx, el.points, el);
+      } else {
+        headWidth = applySmoothStrokePaint(ctx, el);
+        ctx.beginPath();
+        ctx.moveTo(el.points[0].x, el.points[0].y);
+        ctx.lineTo(el.points[1].x, el.points[1].y);
+        ctx.stroke();
+      }
+      drawArrowhead(ctx, el.points[0], el.points[1], headWidth, el.strokeColor, el.opacity);
       break;
     }
     case "rectangle": {
-      ctx.beginPath();
-      roundRectPath(ctx, el.x, el.y, el.width, el.height, el.cornerRadius);
       if (el.fill !== "transparent") {
+        ctx.save();
+        ctx.globalAlpha = el.opacity;
+        ctx.globalCompositeOperation = "source-over";
+        ctx.beginPath();
+        roundRectPath(ctx, el.x, el.y, el.width, el.height, el.cornerRadius);
         ctx.fillStyle = el.fill;
         ctx.fill();
-        ctx.fillStyle = el.strokeColor;
+        ctx.restore();
       }
-      if (el.strokeWidth > 0) ctx.stroke();
+      if (el.strokeWidth > 0) {
+        if (textured) {
+          paintTexturedStroke(ctx, rectPolygon(el.x, el.y, el.width, el.height), el);
+        } else {
+          applySmoothStrokePaint(ctx, el);
+          ctx.beginPath();
+          roundRectPath(ctx, el.x, el.y, el.width, el.height, el.cornerRadius);
+          ctx.stroke();
+        }
+      }
       break;
     }
     case "ellipse": {
       const cx = el.x + el.width / 2;
       const cy = el.y + el.height / 2;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, Math.max(el.width / 2, 0.01), Math.max(el.height / 2, 0.01), 0, 0, Math.PI * 2);
+      const rx = Math.max(el.width / 2, 0.01);
+      const ry = Math.max(el.height / 2, 0.01);
       if (el.fill !== "transparent") {
+        ctx.save();
+        ctx.globalAlpha = el.opacity;
+        ctx.globalCompositeOperation = "source-over";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
         ctx.fillStyle = el.fill;
         ctx.fill();
-        ctx.fillStyle = el.strokeColor;
+        ctx.restore();
       }
-      if (el.strokeWidth > 0) ctx.stroke();
+      if (el.strokeWidth > 0) {
+        if (textured) {
+          paintTexturedStroke(ctx, ellipsePolygon(cx, cy, rx, ry), el);
+        } else {
+          applySmoothStrokePaint(ctx, el);
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
       break;
     }
     case "text": {
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = el.opacity;
       ctx.setLineDash([]);
       ctx.fillStyle = el.strokeColor;
       ctx.font = `${el.fontSize}px ${el.fontFamily === "mono" ? "ui-monospace, Consolas, monospace" : "system-ui, sans-serif"}`;
@@ -161,24 +247,33 @@ export function drawElement(ctx: CanvasRenderingContext2D, el: DrewElement, requ
       const lineHeight = el.fontSize * 1.3;
       const anchorX = el.align === "left" ? el.x : el.align === "right" ? el.x + el.width : el.x + el.width / 2;
       lines.forEach((line, i) => ctx.fillText(line, anchorX, el.y + i * lineHeight));
+      ctx.restore();
       break;
     }
     case "image": {
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
       const img = getCachedImage(el.src, requestRender);
       if (img) {
         ctx.drawImage(img, el.x, el.y, el.width, el.height);
         if (el.strokeWidth > 0) {
+          ctx.strokeStyle = el.strokeColor;
+          ctx.lineWidth = el.strokeWidth;
           ctx.setLineDash(dashArrayFor(el.strokeStyle, el.strokeWidth));
           ctx.strokeRect(el.x, el.y, el.width, el.height);
         }
       } else {
+        ctx.strokeStyle = "#999999";
         ctx.setLineDash([4, 4]);
         ctx.strokeRect(el.x, el.y, el.width, el.height);
       }
+      ctx.restore();
       break;
     }
   }
   ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-over";
 }
 
 // ---------------------------------------------------------------------------
