@@ -1,20 +1,31 @@
 :root {
-  /* Monochrome design tokens. No shadows anywhere in this app — depth and
-     structure come entirely from 1px borders, consistent with a drafting-table
-     aesthetic rather than a soft/elevated one. */
-  --app-bg: #f6f6f6;
-  --panel-bg: #ffffff;
-  --board-bg-color: #eaeaea;
-  --bg: #ffffff;
-  --line: #d9d9d9;
-  --line-strong: #b0b0b0;
-  --text: #4a4a4a;
-  --text-dim: #8c8c8c;
-  --text-strong: #0a0a0a;
-  --hover: #f0f0f0;
+  /* Monochrome, borderless design tokens. Structure comes only from small steps of grey —
+     no border lines, no shadows anywhere in this app. */
+  --gray-0: #ffffff;
+  --gray-50: #f5f5f6;
+  --gray-100: #ececee;
+  --gray-200: #dfe0e3;
+  --gray-900: #17181a;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --app-bg: var(--gray-100);
+  --board-bg-color: var(--gray-100);
+  --panel-bg: var(--gray-0);
+  --bg: var(--gray-0);
+  --surface: var(--gray-100);
+  --hover: var(--gray-200);
+  --active-bg: var(--gray-900);
+  --active-fg: var(--gray-0);
+
+  --text: #55585c;
+  --text-dim: #94979b;
+  --text-strong: var(--gray-900);
+
+  /* Kept for any lingering references; no longer used to draw visible border lines. */
+  --line: transparent;
+  --line-strong: transparent;
+
+  --sans: "Zilla Slab", Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --heading: "Zilla Slab", Georgia, serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 15px/145% var(--sans);
@@ -29,16 +40,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --app-bg: #0b0b0c;
-    --panel-bg: #141415;
-    --board-bg-color: #1d1d1f;
-    --bg: #151516;
-    --line: #303032;
-    --line-strong: #48484b;
-    --text: #b6b6ba;
-    --text-dim: #79797d;
-    --text-strong: #f4f4f4;
-    --hover: #1f1f21;
+    --app-bg: #0c0c0d;
+    --board-bg-color: #0c0c0d;
+    --panel-bg: #19191b;
+    --bg: #19191b;
+    --surface: #222224;
+    --hover: #2c2c2f;
+    --active-bg: #f2f2f3;
+    --active-fg: #0c0c0d;
+
+    --text: #a9abaf;
+    --text-dim: #6f7175;
+    --text-strong: #f2f2f3;
   }
 }
 

@@ -297,13 +297,11 @@ export function drawGrid(ctx: CanvasRenderingContext2D, camera: Camera, viewport
   }
 }
 
-export function drawPageFrame(ctx: CanvasRenderingContext2D, width: number, height: number, background: string, borderColor: string, zoom: number) {
+export function drawPageFrame(ctx: CanvasRenderingContext2D, width: number, height: number, background: string) {
+  // No border stroke — the page reads against the board purely by the contrast between
+  // the two background colors (white page on grey board, or whatever the user picked).
   ctx.fillStyle = background;
   ctx.fillRect(0, 0, width, height);
-  ctx.strokeStyle = borderColor;
-  ctx.lineWidth = 1 / zoom;
-  ctx.setLineDash([]);
-  ctx.strokeRect(0, 0, width, height);
 }
 
 export function drawMarquee(ctx: CanvasRenderingContext2D, b: Bounds, zoom: number, strokeColor: string, fillColor: string) {

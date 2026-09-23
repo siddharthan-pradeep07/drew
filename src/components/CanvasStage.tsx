@@ -121,7 +121,7 @@ const CanvasStage = forwardRef<CanvasStageHandle, CanvasStageProps>(function Can
     }
 
     const page = pageRef.current;
-    drawPageFrame(ctx, page.width, page.height, page.background, "#000000", camera.zoom);
+    drawPageFrame(ctx, page.width, page.height, page.background);
 
     const list = draftListRef.current ?? elementsRef.current;
     for (const el of list) {

@@ -2,7 +2,6 @@
   grid-area: inspector;
   width: 272px;
   background: var(--panel-bg);
-  border-left: 1px solid var(--line);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -16,7 +15,8 @@
 }
 
 .inspector-divider {
-  border-top: 1px solid var(--line);
+  height: 10px;
+  background: var(--surface);
 }
 
 .inspector-title {
@@ -63,9 +63,9 @@
   font: inherit;
   font-size: 13px;
   padding: 6px 8px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--bg);
+  border: none;
+  border-radius: 6px;
+  background: var(--surface);
   color: var(--text-strong);
   width: 100%;
 
@@ -95,34 +95,42 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 6px;
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 6px;
 }
 
 .swatch {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 4px;
-  border: 1px solid var(--line);
+  border-radius: 5px;
+  border: none;
   cursor: pointer;
   padding: 0;
+  opacity: 0.88;
+  transition: transform 0.1s ease, opacity 0.1s ease;
 
+  &:hover {
+    opacity: 1;
+  }
   &.active {
-    outline: 2px solid var(--text-strong);
-    outline-offset: 1px;
+    opacity: 1;
+    transform: scale(1.16);
   }
 }
 
 .swatch-transparent {
   background:
-    linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%) 0 0/8px 8px,
-    linear-gradient(45deg, var(--line) 25%, transparent 25%, transparent 75%, var(--line) 75%) 4px 4px/8px 8px,
+    linear-gradient(45deg, var(--gray-200) 25%, transparent 25%, transparent 75%, var(--gray-200) 75%) 0 0/8px 8px,
+    linear-gradient(45deg, var(--gray-200) 25%, transparent 25%, transparent 75%, var(--gray-200) 75%) 4px 4px/8px 8px,
     var(--bg);
 }
 
 .swatch-custom {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 4px;
-  border: 1px solid var(--line);
+  border-radius: 5px;
+  border: none;
   padding: 2px;
   background: var(--bg);
   cursor: pointer;
@@ -139,9 +147,9 @@
     align-items: center;
     gap: 4px;
     padding: 8px 2px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--bg);
+    border: none;
+    border-radius: 8px;
+    background: var(--surface);
     color: var(--text);
     font-size: 10.5px;
     cursor: pointer;
@@ -150,9 +158,8 @@
       background: var(--hover);
     }
     &.active {
-      background: var(--text-strong);
-      color: var(--bg);
-      border-color: var(--text-strong);
+      background: var(--active-bg);
+      color: var(--active-fg);
     }
   }
 }
@@ -168,16 +175,17 @@
 
 .segmented {
   display: flex;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  overflow: hidden;
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
 
   button {
     flex: 1;
     padding: 6px 4px;
     border: none;
-    border-right: 1px solid var(--line);
-    background: var(--bg);
+    border-radius: 6px;
+    background: transparent;
     color: var(--text);
     font-size: 11.5px;
     cursor: pointer;
@@ -185,12 +193,9 @@
     align-items: center;
     justify-content: center;
 
-    &:last-child {
-      border-right: none;
-    }
     &.active {
-      background: var(--text-strong);
-      color: var(--bg);
+      background: var(--active-bg);
+      color: var(--active-fg);
     }
     &:hover:not(.active) {
       background: var(--hover);
@@ -218,9 +223,9 @@ input[type="range"] {
     align-items: center;
     gap: 4px;
     padding: 10px 4px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--bg);
+    border: none;
+    border-radius: 8px;
+    background: var(--surface);
     color: var(--text-strong);
     font-size: 11px;
     cursor: pointer;
@@ -228,12 +233,9 @@ input[type="range"] {
     &:hover {
       background: var(--hover);
     }
-    &.danger {
-      color: var(--text-strong);
-    }
     &.danger:hover {
-      background: var(--text-strong);
-      color: var(--bg);
+      background: var(--active-bg);
+      color: var(--active-fg);
     }
   }
 }
@@ -242,7 +244,7 @@ input[type="range"] {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  border-bottom: 1px solid var(--line);
+  background: var(--surface);
   font-size: 12px;
   font-weight: 700;
   color: var(--text-strong);
@@ -256,9 +258,7 @@ input[type="range"] {
     bottom: 0;
     width: auto;
     max-height: 78vh;
-    border-left: none;
-    border-top: 1px solid var(--line);
-    border-radius: 12px 12px 0 0;
+    border-radius: 16px 16px 0 0;
     transform: translateY(100%);
     transition: transform 0.2s ease;
     z-index: 50;

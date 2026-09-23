@@ -2,7 +2,6 @@
   grid-area: layers;
   width: 220px;
   background: var(--panel-bg);
-  border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -15,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  border-bottom: 1px solid var(--line);
+  background: var(--surface);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -41,8 +40,7 @@
   align-items: center;
   gap: 8px;
   padding: 7px 8px;
-  border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: 6px;
   color: var(--text);
   cursor: pointer;
   font-size: 12.5px;
@@ -51,9 +49,8 @@
     background: var(--hover);
   }
   &.selected {
-    background: var(--text-strong);
-    color: var(--bg);
-    border-color: var(--text-strong);
+    background: var(--active-bg);
+    color: var(--active-fg);
   }
 }
 
@@ -84,7 +81,7 @@
   height: 20px;
   padding: 0;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   background: transparent;
   color: inherit;
   cursor: pointer;
@@ -104,9 +101,7 @@
     bottom: 0;
     width: auto;
     max-height: 60vh;
-    border-right: none;
-    border-top: 1px solid var(--line);
-    border-radius: 12px 12px 0 0;
+    border-radius: 16px 16px 0 0;
     z-index: 50;
   }
 }

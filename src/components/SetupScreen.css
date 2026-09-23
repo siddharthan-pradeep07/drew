@@ -15,7 +15,7 @@
 .setup-header h1 {
   margin: 0 0 12px;
   font-size: 42px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .setup-subtitle {
@@ -30,8 +30,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 24px;
   background: var(--panel-bg);
@@ -57,9 +56,9 @@
 
 .ghost-btn {
   padding: 9px 16px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: transparent;
+  border: none;
+  border-radius: 8px;
+  background: var(--surface);
   color: var(--text);
   font: inherit;
   font-size: 13px;
@@ -73,8 +72,7 @@
 .custom-size,
 .samples {
   background: var(--panel-bg);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 26px;
   margin-bottom: 20px;
   text-align: left;
@@ -115,9 +113,9 @@
   font: inherit;
   font-size: 14px;
   padding: 9px 11px;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  background: var(--bg);
+  border-radius: 8px;
+  border: none;
+  background: var(--surface);
   color: var(--text-strong);
 
   &:focus-visible {
@@ -132,16 +130,14 @@
   align-items: center;
   gap: 10px;
   padding: 26px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
+  border-radius: 10px;
   background: var(--board-bg-color);
   margin-bottom: 18px;
 }
 
 .preview-box {
   background: var(--bg);
-  border: 1px solid var(--line-strong);
-  border-radius: 2px;
+  border-radius: 3px;
   min-width: 6px;
   min-height: 6px;
 }
@@ -155,10 +151,10 @@
 .start-btn {
   width: 100%;
   padding: 13px 20px;
-  border: 1px solid var(--text-strong);
-  border-radius: 8px;
-  background: var(--text-strong);
-  color: var(--bg);
+  border: none;
+  border-radius: 10px;
+  background: var(--active-bg);
+  color: var(--active-fg);
   font: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -190,16 +186,16 @@
   align-items: center;
   gap: 10px;
   padding: 18px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
   background: var(--board-bg-color);
   cursor: pointer;
   font: inherit;
   color: inherit;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition: background 0.12s ease;
 
   &:hover {
-    border-color: var(--text-strong);
+    background: var(--hover);
   }
 }
 
@@ -236,7 +232,7 @@
   .custom-size,
   .samples {
     padding: 18px;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .resume-card {

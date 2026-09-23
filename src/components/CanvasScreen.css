@@ -32,8 +32,7 @@
   align-items: center;
   gap: 2px;
   background: var(--panel-bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 3px;
   z-index: 10;
 }

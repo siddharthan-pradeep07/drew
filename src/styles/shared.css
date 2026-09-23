@@ -1,5 +1,7 @@
 /* Primitives shared across the toolbar, inspector and layers panel. Kept as
-   one file so every panel button looks and behaves identically. */
+   one file so every panel button looks and behaves identically. No border lines
+   or shadows anywhere — a button is set apart from its background purely by a
+   lighter/darker step of grey. */
 
 .icon-btn {
   display: inline-flex;
@@ -9,29 +11,29 @@
   width: 34px;
   height: 34px;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: transparent;
+  border: none;
+  border-radius: 8px;
+  background: var(--surface);
   color: var(--text-strong);
   cursor: pointer;
-  transition: background 0.1s ease, border-color 0.1s ease;
+  transition: background 0.1s ease, color 0.1s ease;
 
   &:hover:not(:disabled) {
     background: var(--hover);
-    border-color: var(--line);
   }
   &:disabled {
+    background: transparent;
     color: var(--text-dim);
     cursor: not-allowed;
   }
   &.active {
-    background: var(--text-strong);
-    color: var(--bg);
-    border-color: var(--text-strong);
+    background: var(--active-bg);
+    color: var(--active-fg);
   }
   &.small {
     width: 26px;
     height: 26px;
+    border-radius: 6px;
   }
 }
 
