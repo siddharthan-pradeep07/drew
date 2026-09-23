@@ -1,72 +1,44 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  /* App chrome (toolbar / canvas surface) */
-  --app-bg: #f1f0f4;
+  /* Monochrome design tokens. No shadows anywhere in this app — depth and
+     structure come entirely from 1px borders, consistent with a drafting-table
+     aesthetic rather than a soft/elevated one. */
+  --app-bg: #f6f6f6;
   --panel-bg: #ffffff;
-  --page-bg: #ffffff;
-  --hover-bg: rgba(8, 6, 13, 0.06);
-  --danger: #e03131;
-  --danger-bg: rgba(224, 49, 49, 0.1);
-  --text-disabled: #c9c7cf;
-  --shadow-canvas: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 28px rgba(0, 0, 0, 0.1);
-  --shadow-pop: var(--shadow);
+  --board-bg-color: #eaeaea;
+  --bg: #ffffff;
+  --line: #d9d9d9;
+  --line-strong: #b0b0b0;
+  --text: #4a4a4a;
+  --text-dim: #8c8c8c;
+  --text-strong: #0a0a0a;
+  --hover: #f0f0f0;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font: 15px/145% var(--sans);
   color-scheme: light dark;
   color: var(--text);
-  background: var(--bg);
+  background: var(--app-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-
-    --app-bg: #0e0f14;
-    --panel-bg: #1b1c24;
-    --page-bg: #ffffff;
-    --hover-bg: rgba(255, 255, 255, 0.08);
-    --danger: #ff6b6b;
-    --danger-bg: rgba(255, 107, 107, 0.15);
-    --text-disabled: #4b4d59;
-    --shadow-canvas: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.55);
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    --app-bg: #0b0b0c;
+    --panel-bg: #141415;
+    --board-bg-color: #1d1d1f;
+    --bg: #151516;
+    --line: #303032;
+    --line-strong: #48484b;
+    --text: #b6b6ba;
+    --text-dim: #79797d;
+    --text-strong: #f4f4f4;
+    --hover: #1f1f21;
   }
 }
 
@@ -76,56 +48,40 @@
   box-sizing: border-box;
 }
 
-#root {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+html,
+body {
+  height: 100%;
 }
 
 body {
   margin: 0;
 }
 
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 h1,
 h2 {
   font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+  font-weight: 600;
+  color: var(--text-strong);
+  margin: 0;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
 p {
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+button {
+  font: inherit;
 }

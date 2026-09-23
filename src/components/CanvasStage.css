@@ -1,0 +1,40 @@
+.canvas-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--board-bg-color);
+  touch-action: none;
+}
+
+.canvas-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-stage[data-tool="select"] canvas {
+  cursor: default;
+}
+
+.canvas-stage[data-tool="pan"] canvas {
+  cursor: grab;
+}
+
+.canvas-stage[data-tool="pen"] canvas,
+.canvas-stage[data-tool="line"] canvas,
+.canvas-stage[data-tool="arrow"] canvas,
+.canvas-stage[data-tool="rectangle"] canvas,
+.canvas-stage[data-tool="ellipse"] canvas {
+  cursor: crosshair;
+}
+
+.canvas-stage[data-tool="text"] canvas {
+  cursor: text;
+}
+
+.canvas-stage[data-tool="eraser"] canvas {
+  cursor:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22"><rect x="2" y="2" width="18" height="18" rx="3" fill="white" stroke="black" stroke-width="1.5"/></svg>')
+      11 11,
+    auto;
+}

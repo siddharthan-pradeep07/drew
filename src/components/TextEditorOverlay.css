@@ -1,0 +1,19 @@
+.text-editor-overlay {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 1px dashed var(--line-strong);
+  background: rgba(255, 255, 255, 0.6);
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  min-height: 1.3em;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (prefers-color-scheme: dark) {
+  .text-editor-overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+}

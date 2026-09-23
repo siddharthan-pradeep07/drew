@@ -1,98 +1,86 @@
 import { useEffect, useRef, useState } from "react";
 import type { ComponentType } from "react";
-import type { DownloadFormat, DrawStyle, StrokeStyle, Tool } from "../types";
+import type { DownloadFormat, Tool } from "../types";
 import {
   ArrowLeftIcon,
-  CloseIcon,
+  ArrowToolIcon,
+  CursorIcon,
   DownloadIcon,
   EllipseIcon,
   EraserIcon,
+  HandIcon,
+  HelpIcon,
   ImagePlusIcon,
+  LayersIcon,
   LineToolIcon,
   PenIcon,
   RectangleIcon,
   RedoIcon,
   SlidersIcon,
-  TrashIcon,
+  TextToolIcon,
   UndoIcon,
 } from "./Icons";
 import "./Toolbar.css";
 
-const TOOLS: { id: Tool; label: string; icon: ComponentType<{ size?: number }> }[] = [
-  { id: "pen", label: "Pen", icon: PenIcon },
-  { id: "line", label: "Line", icon: LineToolIcon },
-  { id: "rectangle", label: "Rectangle", icon: RectangleIcon },
-  { id: "ellipse", label: "Ellipse", icon: EllipseIcon },
-  { id: "eraser", label: "Eraser", icon: EraserIcon },
-];
-
-const PRESET_COLORS = [
-  "#08060d",
-  "#ffffff",
-  "#e03131",
-  "#f08c00",
-  "#ffd43b",
-  "#2f9e44",
-  "#1971c2",
-  "#7048e8",
-  "#aa3bff",
-  "#e64980",
-];
-
-const STROKE_STYLES: { id: StrokeStyle; label: string }[] = [
-  { id: "solid", label: "Solid" },
-  { id: "dashed", label: "Dashed" },
-  { id: "dotted", label: "Dotted" },
+const TOOLS: { id: Tool; label: string; shortcut: string; icon: ComponentType<{ size?: number }> }[] = [
+  { id: "select", label: "Select", shortcut: "V", icon: CursorIcon },
+  { id: "pan", label: "Pan", shortcut: "H", icon: HandIcon },
+  { id: "pen", label: "Pen", shortcut: "P", icon: PenIcon },
+  { id: "line", label: "Line", shortcut: "L", icon: LineToolIcon },
+  { id: "arrow", label: "Arrow", shortcut: "A", icon: ArrowToolIcon },
+  { id: "rectangle", label: "Rectangle", shortcut: "R", icon: RectangleIcon },
+  { id: "ellipse", label: "Ellipse", shortcut: "O", icon: EllipseIcon },
+  { id: "text", label: "Text", shortcut: "T", icon: TextToolIcon },
+  { id: "eraser", label: "Eraser", shortcut: "E", icon: EraserIcon },
 ];
 
 interface ToolbarProps {
   pageLabel: string;
   tool: Tool;
   onToolChange: (tool: Tool) => void;
-  style: DrawStyle;
-  onStyleChange: (patch: Partial<DrawStyle>) => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
-  onClear: () => void;
   onInsertFile: (file: File) => void;
   onDownload: (format: DownloadFormat) => void;
   onBack: () => void;
+  layersOpen: boolean;
+  onToggleLayers: () => void;
+  onToggleInspector: () => void;
+  onShowHelp: () => void;
+  saveLabel: string;
 }
 
 export default function Toolbar({
   pageLabel,
   tool,
   onToolChange,
-  style,
-  onStyleChange,
   canUndo,
   canRedo,
   onUndo,
   onRedo,
-  onClear,
   onInsertFile,
   onDownload,
   onBack,
+  layersOpen,
+  onToggleLayers,
+  onToggleInspector,
+  onShowHelp,
+  saveLabel,
 }: ToolbarProps) {
   const [downloadOpen, setDownloadOpen] = useState(false);
-  const [styleOpen, setStyleOpen] = useState(false);
   const downloadRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!downloadOpen) return;
     const onDocClick = (e: MouseEvent) => {
-      if (downloadRef.current && !downloadRef.current.contains(e.target as Node)) {
-        setDownloadOpen(false);
-      }
+      if (downloadRef.current && !downloadRef.current.contains(e.target as Node)) setDownloadOpen(false);
     };
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [downloadOpen]);
-
-  const isEraser = tool === "eraser";
 
   return (
     <>
@@ -100,7 +88,11 @@ export default function Toolbar({
         <button className="icon-btn" onClick={onBack} aria-label="Back to page setup" title="Back">
           <ArrowLeftIcon />
         </button>
+        <button className={`icon-btn ${layersOpen ? "active" : ""}`} onClick={onToggleLayers} aria-label="Toggle layers" title="Layers">
+          <LayersIcon />
+        </button>
         <span className="page-label">{pageLabel}</span>
+        <span className="save-label">{saveLabel}</span>
         <div className="topbar-spacer" />
 
         <div className="topbar-group">
@@ -129,17 +121,12 @@ export default function Toolbar({
           />
 
           <div className="dropdown" ref={downloadRef}>
-            <button
-              className="icon-btn"
-              onClick={() => setDownloadOpen((o) => !o)}
-              aria-label="Download drawing"
-              title="Download"
-            >
+            <button className="icon-btn" onClick={() => setDownloadOpen((o) => !o)} aria-label="Download drawing" title="Download">
               <DownloadIcon />
             </button>
             {downloadOpen && (
               <div className="dropdown-menu" role="menu">
-                {(["png", "jpeg", "webp"] as DownloadFormat[]).map((format) => (
+                {(["png", "jpeg", "webp", "svg"] as DownloadFormat[]).map((format) => (
                   <button
                     key={format}
                     role="menuitem"
@@ -155,115 +142,31 @@ export default function Toolbar({
             )}
           </div>
 
-          <button className="icon-btn danger" onClick={onClear} aria-label="Clear canvas" title="Clear canvas">
-            <TrashIcon />
+          <button className="icon-btn" onClick={onShowHelp} aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">
+            <HelpIcon />
           </button>
         </div>
 
-        <button
-          className="icon-btn style-toggle"
-          onClick={() => setStyleOpen((o) => !o)}
-          aria-label="Toggle style options"
-          aria-expanded={styleOpen}
-          title="Style options"
-        >
+        <button className="icon-btn style-toggle mobile-only" onClick={onToggleInspector} aria-label="Toggle style panel" title="Style">
           <SlidersIcon />
         </button>
       </header>
 
       <nav className="tool-rail">
-        {TOOLS.map(({ id, label, icon: Icon }) => (
+        {TOOLS.map(({ id, label, shortcut, icon: Icon }) => (
           <button
             key={id}
             className={`tool-btn ${tool === id ? "active" : ""}`}
             onClick={() => onToolChange(id)}
             aria-label={label}
             aria-pressed={tool === id}
-            title={label}
+            title={`${label} (${shortcut})`}
           >
-            <Icon size={20} />
+            <Icon size={19} />
             <span className="tool-label">{label}</span>
           </button>
         ))}
       </nav>
-
-      {styleOpen && <div className="style-backdrop" onClick={() => setStyleOpen(false)} />}
-
-      <aside className={`style-panel ${styleOpen ? "open" : ""}`}>
-        <div className="style-panel-header">
-          <span>Style</span>
-          <button className="icon-btn small" onClick={() => setStyleOpen(false)} aria-label="Close style panel">
-            <CloseIcon size={16} />
-          </button>
-        </div>
-
-        <div className={`style-section ${isEraser ? "disabled" : ""}`}>
-          <div className="style-section-label">Color</div>
-          <div className="swatch-grid">
-            {PRESET_COLORS.map((c) => (
-              <button
-                key={c}
-                className={`swatch ${style.color === c ? "active" : ""}`}
-                style={{ background: c }}
-                disabled={isEraser}
-                onClick={() => onStyleChange({ color: c })}
-                aria-label={`Colour ${c}`}
-              />
-            ))}
-            <input
-              className="swatch-custom"
-              type="color"
-              value={style.color}
-              disabled={isEraser}
-              onChange={(e) => onStyleChange({ color: e.target.value })}
-              aria-label="Custom colour"
-            />
-          </div>
-        </div>
-
-        <div className="style-section">
-          <div className="style-section-label">
-            Stroke width <span className="style-value">{style.strokeWidth}px</span>
-          </div>
-          <input
-            type="range"
-            min={1}
-            max={64}
-            value={style.strokeWidth}
-            onChange={(e) => onStyleChange({ strokeWidth: Number(e.target.value) })}
-          />
-        </div>
-
-        <div className={`style-section ${isEraser ? "disabled" : ""}`}>
-          <div className="style-section-label">Stroke style</div>
-          <div className="segmented">
-            {STROKE_STYLES.map((s) => (
-              <button
-                key={s.id}
-                className={style.strokeStyle === s.id ? "active" : ""}
-                disabled={isEraser}
-                onClick={() => onStyleChange({ strokeStyle: s.id })}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={`style-section ${isEraser ? "disabled" : ""}`}>
-          <div className="style-section-label">
-            Opacity <span className="style-value">{Math.round(style.opacity * 100)}%</span>
-          </div>
-          <input
-            type="range"
-            min={5}
-            max={100}
-            value={Math.round(style.opacity * 100)}
-            disabled={isEraser}
-            onChange={(e) => onStyleChange({ opacity: Number(e.target.value) / 100 })}
-          />
-        </div>
-      </aside>
     </>
   );
 }
